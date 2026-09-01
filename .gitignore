@@ -1,0 +1,25 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# .NET build output
+[Bb]in/
+[Oo]bj/
+
+# VS Code
+.vscode/
+
+# React / Node
+node_modules/
+dist/
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# Operating system files
+.DS_Store
+Thumbs.db
