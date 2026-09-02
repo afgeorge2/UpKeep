@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using UpKeep.Contracts.Properties;
 using UpKeep.Models;
 
 namespace UpKeep.Controllers;
@@ -40,5 +41,27 @@ public class PropertiesController : ControllerBase
         }
 
         return Ok(property);
+    }
+
+    [HttpPost]
+    public ActionResult<Property> CreateProperty(CreatePropertyRequest request)
+    {
+        var nextId = Properties.Count == 0
+            ? 1
+            : Properties.Max(property => property.Id) + 1;
+
+        var property = new Property
+        {
+            Id = nextId,
+            Name = request.Name,
+            Address = request.Address
+        };
+
+        Properties.Add(property);
+
+        return CreatedAtAction(
+            nameof(GetProperty),
+            new { id = property.Id },
+            property);
     }
 }
