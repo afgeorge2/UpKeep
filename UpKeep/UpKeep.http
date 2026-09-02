@@ -1,6 +1,8 @@
 @UpKeep_HostAddress = http://localhost:5085
 
-GET {{UpKeep_HostAddress}}/weatherforecast/
+### Get all properties
+
+GET {{UpKeep_HostAddress}}/api/properties
 Accept: application/json
 
 ###

@@ -1,19 +1,18 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 
-interface WeatherForecast {
-  date: string
-  temperatureC: number
-  temperatureF: number
-  summary: string | null
+interface Property {
+  id: number
+  name: string
+  address: string
 }
 
 function App() {
-  const [forecasts, setForecasts] = useState<WeatherForecast[]>([])
+  const [properties, setProperties] = useState<Property[]>([])
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('http://localhost:5085/weatherforecast')
+    fetch('http://localhost:5085/api/properties')
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Request failed: ${response.status}`)
@@ -21,8 +20,8 @@ function App() {
 
         return response.json()
       })
-      .then((data: WeatherForecast[]) => {
-        setForecasts(data)
+      .then((data: Property[]) => {
+        setProperties(data)
       })
       .catch((requestError: Error) => {
         setError(requestError.message)
@@ -34,15 +33,15 @@ function App() {
       <h1>Upkeep</h1>
       <p>Home maintenance management</p>
 
-      {error && <p>Unable to load forecasts: {error}</p>}
+      {error && <p>Unable to load properties: {error}</p>}
 
-      {forecasts.length === 0 && !error ? (
-        <p>Loading forecasts...</p>
+      {properties.length === 0 && !error ? (
+        <p>Loading properties...</p>
       ) : (
         <ul>
-          {forecasts.map((forecast) => (
-            <li key={forecast.date}>
-              {forecast.date}: {forecast.temperatureC}°C — {forecast.summary}
+          {properties.map((property) => (
+            <li key={property.id}>
+              <strong>{property.name}</strong> — {property.address}
             </li>
           ))}
         </ul>
