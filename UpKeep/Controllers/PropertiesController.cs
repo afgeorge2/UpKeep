@@ -7,25 +7,38 @@ namespace UpKeep.Controllers;
 [Route("api/[controller]")]
 public class PropertiesController : ControllerBase
 {
+    private static readonly List<Property> Properties =
+    [
+        new()
+        {
+            Id = 1,
+            Name = "Primary Home",
+            Address = "123 Main Street"
+        },
+        new()
+        {
+            Id = 2,
+            Name = "Rental Property",
+            Address = "456 Oak Avenue"
+        }
+    ];
+
     [HttpGet]
     public ActionResult<IEnumerable<Property>> GetProperties()
     {
-        var properties = new List<Property>
-        {
-            new()
-            {
-                Id = 1,
-                Name = "Primary Home",
-                Address = "123 Main Street"
-            },
-            new()
-            {
-                Id = 2,
-                Name = "Rental Property",
-                Address = "456 Oak Avenue"
-            }
-        };
+        return Ok(Properties);
+    }
 
-        return Ok(properties);
+    [HttpGet("{id:int}")]
+    public ActionResult<Property> GetProperty(int id)
+    {
+        var property = Properties.FirstOrDefault(property => property.Id == id);
+
+        if (property is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(property);
     }
 }
