@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using UpKeep.Contracts.Properties;
+using UpKeep.Data;
 using UpKeep.Models;
 
 namespace UpKeep.Controllers;
@@ -8,32 +10,29 @@ namespace UpKeep.Controllers;
 [Route("api/[controller]")]
 public class PropertiesController : ControllerBase
 {
-    private static readonly List<Property> Properties =
-    [
-        new()
-        {
-            Id = 1,
-            Name = "Primary Home",
-            Address = "123 Main Street"
-        },
-        new()
-        {
-            Id = 2,
-            Name = "Rental Property",
-            Address = "456 Oak Avenue"
-        }
-    ];
+    private readonly UpKeepDbContext _dbContext;
+
+    public PropertiesController(UpKeepDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
 
     [HttpGet]
-    public ActionResult<IEnumerable<Property>> GetProperties()
+    public async Task<ActionResult<IEnumerable<Property>>> GetProperties()
     {
-        return Ok(Properties);
+        var properties = await _dbContext.Properties
+            .AsNoTracking()
+            .ToListAsync();
+
+        return Ok(properties);
     }
 
     [HttpGet("{id:int}")]
-    public ActionResult<Property> GetProperty(int id)
+    public async Task<ActionResult<Property>> GetProperty(int id)
     {
-        var property = Properties.FirstOrDefault(property => property.Id == id);
+        var property = await _dbContext.Properties
+            .AsNoTracking()
+            .FirstOrDefaultAsync(property => property.Id == id);
 
         if (property is null)
         {
@@ -44,20 +43,17 @@ public class PropertiesController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<Property> CreateProperty(CreatePropertyRequest request)
+    public async Task<ActionResult<Property>> CreateProperty(
+        CreatePropertyRequest request)
     {
-        var nextId = Properties.Count == 0
-            ? 1
-            : Properties.Max(property => property.Id) + 1;
-
         var property = new Property
         {
-            Id = nextId,
             Name = request.Name,
             Address = request.Address
         };
 
-        Properties.Add(property);
+        _dbContext.Properties.Add(property);
+        await _dbContext.SaveChangesAsync();
 
         return CreatedAtAction(
             nameof(GetProperty),

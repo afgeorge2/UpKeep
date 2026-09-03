@@ -1,4 +1,15 @@
+using Microsoft.EntityFrameworkCore;
+using UpKeep.Data;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<UpKeepDbContext>(options =>
+{
+    var connectionString =
+        builder.Configuration.GetConnectionString("UpKeepDatabase");
+
+    options.UseSqlServer(connectionString);
+});
 
 // Add services to the container.
 
