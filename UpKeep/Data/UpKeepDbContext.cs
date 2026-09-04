@@ -11,4 +11,5 @@ public class UpKeepDbContext : DbContext
     }
 
     public DbSet<Property> Properties => Set<Property>();
+    public DbSet<MaintenanceTask> MaintenanceTasks => Set<MaintenanceTask>();
 }
