@@ -13,6 +13,32 @@ function formatDueDate(value: string) {
   return new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(year, month - 1, day))
 }
 
+function getLocalDateString() {
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, '0')
+  const day = String(today.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+function getTaskTiming(task: MaintenanceTask) {
+  if (task.isCompleted) {
+    return { state: 'complete', label: `Due ${formatDueDate(task.dueDate)}` }
+  }
+
+  const today = getLocalDateString()
+
+  if (task.dueDate < today) {
+    return { state: 'overdue', label: `Overdue · Was due ${formatDueDate(task.dueDate)}` }
+  }
+
+  if (task.dueDate === today) {
+    return { state: 'today', label: 'Due today' }
+  }
+
+  return { state: 'upcoming', label: `Due ${formatDueDate(task.dueDate)}` }
+}
+
 function App() {
   const [properties, setProperties] = useState<Property[]>([])
   const [selectedPropertyId, setSelectedPropertyId] = useState<number | null>(null)
@@ -300,9 +326,12 @@ function App() {
             <div className="tasks" aria-live="polite">
               {isLoadingTasks ? <p className="empty-state">Loading maintenance tasks…</p> : tasks.length === 0 ? (
                 <div className="empty-state"><strong>No maintenance scheduled</strong><span>Add a task above to start building this property’s plan.</span></div>
-              ) : tasks.map((task) => (
-                <article className="task-card" key={task.id}>
-                  <div className={task.isCompleted ? 'status-dot complete' : 'status-dot'} aria-hidden="true" />
+              ) : tasks.map((task) => {
+                const timing = getTaskTiming(task)
+
+                return (
+                <article className={`task-card ${timing.state}`} key={task.id}>
+                  <div className={`status-dot ${timing.state}`} aria-hidden="true" />
                   <div className="task-content">
                     {editingTaskId === task.id ? (
                       <form className="edit-task-form" onSubmit={(event) => void handleTaskEditSubmit(event, task)}>
@@ -326,12 +355,13 @@ function App() {
                             <button aria-label={`Delete ${task.title}`} className="delete-task-button" disabled={deletingTaskId === task.id || updatingTaskId === task.id} onClick={() => void handleTaskDelete(task)} type="button">{deletingTaskId === task.id ? 'Deleting…' : 'Delete'}</button>
                           </div>
                         </div>
-                        <p>{task.description}</p><time dateTime={task.dueDate}>Due {formatDueDate(task.dueDate)}</time>
+                        <p>{task.description}</p><time className={`due-date ${timing.state}`} dateTime={task.dueDate}>{timing.label}</time>
                       </>
                     )}
                   </div>
                 </article>
-              ))}
+                )
+              })}
             </div>
           </> : (
             <div className="no-selection"><p className="eyebrow">Maintenance plan</p><h2>Choose a property</h2><p>Add or select a property to see its maintenance tasks.</p></div>

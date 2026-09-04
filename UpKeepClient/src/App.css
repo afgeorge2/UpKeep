@@ -42,14 +42,18 @@ button:disabled { cursor: wait; opacity: .58; }
 .description-field { grid-column: 1 / -1; }
 .tasks { display: grid; gap: 12px; padding-top: 26px; }
 .task-card { display: flex; gap: 15px; padding: 19px; border: 1px solid var(--border); border-radius: 13px; }
+.task-card.overdue { border-color: rgba(164, 60, 60, .3); background: var(--danger-soft); }
 .status-dot { flex: 0 0 auto; width: 9px; height: 9px; margin-top: 7px; border-radius: 50%; background: var(--warning); box-shadow: 0 0 0 4px var(--warning-soft); }
 .status-dot.complete { background: var(--success); box-shadow: 0 0 0 4px var(--success-soft); }
+.status-dot.overdue { background: var(--danger); box-shadow: 0 0 0 4px rgba(164, 60, 60, .12); }
 .task-content { min-width: 0; flex: 1; }
 .task-title-row { align-items: flex-start; }
 .task-actions { display: flex; align-items: center; gap: 8px; }
 .task-card h3 { margin: 0; font-size: 1rem; }
 .task-card p { margin: 7px 0 12px; color: var(--text-muted); font-size: .86rem; line-height: 1.55; }
 .task-card time { color: var(--text-muted); font-size: .75rem; font-weight: 700; }
+.task-card time.overdue { color: var(--danger); }
+.task-card time.today { color: var(--warning-text); }
 .status { flex: 0 0 auto; padding: 5px 9px; color: var(--warning-text); background: var(--warning-soft); }
 .status.complete { color: var(--success); background: var(--success-soft); }
 .task-card button.status { border: 0; cursor: pointer; }
