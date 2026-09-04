@@ -106,6 +106,28 @@ public class MaintenanceTasksController : ControllerBase
             response);
     }
 
+    [HttpPatch("{id:int}/status")]
+    public async Task<ActionResult<MaintenanceTaskResponse>>
+        UpdateMaintenanceTaskStatus(
+            int propertyId,
+            int id,
+            UpdateMaintenanceTaskStatusRequest request)
+    {
+        var maintenanceTask = await _dbContext.MaintenanceTasks
+            .FirstOrDefaultAsync(task =>
+                task.PropertyId == propertyId && task.Id == id);
+
+        if (maintenanceTask is null)
+        {
+            return NotFound();
+        }
+
+        maintenanceTask.IsCompleted = request.IsCompleted;
+        await _dbContext.SaveChangesAsync();
+
+        return Ok(ToResponse(maintenanceTask));
+    }
+
     private static MaintenanceTaskResponse ToResponse(MaintenanceTask task)
     {
         return new MaintenanceTaskResponse

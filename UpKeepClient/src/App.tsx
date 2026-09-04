@@ -28,6 +28,7 @@ function App() {
   const [isLoadingTasks, setIsLoadingTasks] = useState(false)
   const [isAddingProperty, setIsAddingProperty] = useState(false)
   const [isAddingTask, setIsAddingTask] = useState(false)
+  const [updatingTaskId, setUpdatingTaskId] = useState<number | null>(null)
 
   const selectedProperty = properties.find((property) => property.id === selectedPropertyId)
 
@@ -115,6 +116,24 @@ function App() {
     }
   }
 
+  async function handleTaskStatusChange(task: MaintenanceTask) {
+    setTaskError(null)
+    setUpdatingTaskId(task.id)
+    try {
+      const response = await fetch(`${apiBaseUrl}/properties/${task.propertyId}/maintenance-tasks/${task.id}/status`, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isCompleted: !task.isCompleted }),
+      })
+      if (!response.ok) throw new Error(`Request failed: ${response.status}`)
+      const updatedTask: MaintenanceTask = await response.json()
+      setTasks((current) => current.map((item) => item.id === updatedTask.id ? updatedTask : item))
+    } catch (error) {
+      setTaskError(getErrorMessage(error))
+    } finally {
+      setUpdatingTaskId(null)
+    }
+  }
+
   return (
     <main className="app-shell">
       <header className="app-header">
@@ -172,7 +191,7 @@ function App() {
                 <article className="task-card" key={task.id}>
                   <div className={task.isCompleted ? 'status-dot complete' : 'status-dot'} aria-hidden="true" />
                   <div className="task-content">
-                    <div className="task-title-row"><h3>{task.title}</h3><span className={task.isCompleted ? 'status complete' : 'status'}>{task.isCompleted ? 'Completed' : 'Upcoming'}</span></div>
+                    <div className="task-title-row"><h3>{task.title}</h3><button className={task.isCompleted ? 'status complete' : 'status'} disabled={updatingTaskId === task.id} onClick={() => void handleTaskStatusChange(task)} type="button">{updatingTaskId === task.id ? 'Saving…' : task.isCompleted ? 'Completed' : 'Mark complete'}</button></div>
                     <p>{task.description}</p><time dateTime={task.dueDate}>Due {formatDueDate(task.dueDate)}</time>
                   </div>
                 </article>
