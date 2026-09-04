@@ -23,10 +23,12 @@ function App() {
   const [taskDescription, setTaskDescription] = useState('')
   const [taskDueDate, setTaskDueDate] = useState('')
   const [propertyError, setPropertyError] = useState<string | null>(null)
+  const [propertyDeleteError, setPropertyDeleteError] = useState<string | null>(null)
   const [taskError, setTaskError] = useState<string | null>(null)
   const [isLoadingProperties, setIsLoadingProperties] = useState(true)
   const [isLoadingTasks, setIsLoadingTasks] = useState(false)
   const [isAddingProperty, setIsAddingProperty] = useState(false)
+  const [isDeletingProperty, setIsDeletingProperty] = useState(false)
   const [isAddingTask, setIsAddingTask] = useState(false)
   const [updatingTaskId, setUpdatingTaskId] = useState<number | null>(null)
 
@@ -134,6 +136,36 @@ function App() {
     }
   }
 
+  async function handlePropertyDelete() {
+    if (!selectedProperty) return
+
+    const shouldDelete = window.confirm(
+      `Delete "${selectedProperty.name}" and all of its maintenance tasks? This cannot be undone.`,
+    )
+
+    if (!shouldDelete) return
+
+    setPropertyDeleteError(null)
+    setIsDeletingProperty(true)
+    try {
+      const response = await fetch(`${apiBaseUrl}/properties/${selectedProperty.id}`, {
+        method: 'DELETE',
+      })
+      if (!response.ok) throw new Error(`Request failed: ${response.status}`)
+
+      const remainingProperties = properties.filter(
+        (property) => property.id !== selectedProperty.id,
+      )
+      setProperties(remainingProperties)
+      setSelectedPropertyId(remainingProperties[0]?.id ?? null)
+      setTasks([])
+    } catch (error) {
+      setPropertyDeleteError(getErrorMessage(error))
+    } finally {
+      setIsDeletingProperty(false)
+    }
+  }
+
   return (
     <main className="app-shell">
       <header className="app-header">
@@ -171,8 +203,13 @@ function App() {
           {selectedProperty ? <>
             <div className="section-heading task-heading">
               <div><p className="eyebrow">Maintenance plan</p><h2>{selectedProperty.name}</h2><p className="muted">{selectedProperty.address}</p></div>
-              <span className="task-count">{tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}</span>
+              <div className="property-actions">
+                <span className="task-count">{tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}</span>
+                <button className="delete-property-button" disabled={isDeletingProperty} onClick={() => void handlePropertyDelete()} type="button">{isDeletingProperty ? 'Deleting…' : 'Delete property'}</button>
+              </div>
             </div>
+
+            {propertyDeleteError && <p className="error panel-error" role="alert">{propertyDeleteError}</p>}
 
             <form className="task-form" onSubmit={handleTaskSubmit}>
               <div className="form-grid">

@@ -51,6 +51,23 @@ try {
         -NoNewWindow `
         -PassThru
 
+    Write-Host 'Waiting for the API to become ready...'
+    $apiStartDeadline = [DateTime]::UtcNow.AddSeconds(30)
+
+    while (-not (Test-LocalPort -Port 5085)) {
+        if ($apiProcess.HasExited) {
+            throw "The API stopped unexpectedly with exit code $($apiProcess.ExitCode)."
+        }
+
+        if ([DateTime]::UtcNow -ge $apiStartDeadline) {
+            throw 'The API did not start within 30 seconds.'
+        }
+
+        Start-Sleep -Milliseconds 250
+    }
+
+    Write-Host 'API ready. Starting React client...'
+
     $clientProcess = Start-Process `
         -FilePath 'node' `
         -ArgumentList @($viteCli) `

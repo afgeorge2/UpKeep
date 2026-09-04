@@ -60,4 +60,20 @@ public class PropertiesController : ControllerBase
             new { id = property.Id },
             property);
     }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteProperty(int id)
+    {
+        var property = await _dbContext.Properties.FindAsync(id);
+
+        if (property is null)
+        {
+            return NotFound();
+        }
+
+        _dbContext.Properties.Remove(property);
+        await _dbContext.SaveChangesAsync();
+
+        return NoContent();
+    }
 }

@@ -33,6 +33,9 @@ button:disabled { cursor: wait; opacity: .58; }
 .task-panel { min-height: 640px; padding: 34px; }
 .task-heading { align-items: flex-start; margin-bottom: 30px; }
 .task-count { padding: 8px 12px; }
+.property-actions { display: flex; align-items: center; gap: 10px; }
+.delete-property-button { min-height: 34px; padding: 0 11px; border: 1px solid var(--danger); border-radius: 9px; background: transparent; color: var(--danger); font-size: .75rem; font-weight: 750; cursor: pointer; }
+.delete-property-button:hover { background: var(--danger-soft); }
 .task-form { display: flex; align-items: flex-end; gap: 18px; padding: 26px 0 30px; border-bottom: 1px solid var(--border); }
 .form-grid { display: grid; flex: 1; grid-template-columns: 2fr 1fr; gap: 14px; }
 .field { display: grid; gap: 6px; }
@@ -64,6 +67,7 @@ button:disabled { cursor: wait; opacity: .58; }
   .workspace { grid-template-columns: 1fr; }
   .sidebar { border-right: 0; border-bottom: 1px solid var(--border); }
   .task-panel { min-height: 0; padding: 28px 22px; }
+  .task-heading { flex-direction: column; }
   .task-form { align-items: stretch; flex-direction: column; }
   .primary-button { align-self: stretch; }
 }
