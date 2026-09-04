@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import './App.css'
 
-const apiBaseUrl = 'http://localhost:5085/api'
+const apiBaseUrl = '/api'
 
 interface Property { id: number; name: string; address: string }
 interface MaintenanceTask { id: number; title: string; description: string; dueDate: string; isCompleted: boolean; propertyId: number }
