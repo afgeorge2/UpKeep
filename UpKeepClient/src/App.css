@@ -57,6 +57,12 @@ button:disabled { cursor: wait; opacity: .58; }
 .task-card button.status:disabled { cursor: wait; }
 .delete-task-button { padding: 5px 7px; border: 0; background: transparent; color: var(--danger); font-size: .75rem; font-weight: 750; cursor: pointer; }
 .delete-task-button:hover { text-decoration: underline; }
+.edit-task-button, .cancel-button { padding: 5px 7px; border: 0; background: transparent; color: var(--text-muted); font-size: .75rem; font-weight: 750; cursor: pointer; }
+.edit-task-button:hover, .cancel-button:hover { color: var(--text); text-decoration: underline; }
+.edit-task-form { display: grid; gap: 14px; }
+.edit-task-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; }
+.edit-task-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.edit-task-actions .primary-button { min-height: 36px; }
 .empty-state, .no-selection { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 190px; color: var(--text-muted); text-align: center; }
 .empty-state strong { margin-bottom: 5px; color: var(--text); }
 .empty-state span, .empty-copy { font-size: .86rem; }
@@ -72,6 +78,8 @@ button:disabled { cursor: wait; opacity: .58; }
   .task-panel { min-height: 0; padding: 28px 22px; }
   .task-heading { flex-direction: column; }
   .task-form { align-items: stretch; flex-direction: column; }
+  .edit-task-grid { grid-template-columns: 1fr; }
+  .edit-task-grid .description-field { grid-column: auto; }
   .primary-button { align-self: stretch; }
 }
 @media (max-width: 520px) {

@@ -32,6 +32,11 @@ function App() {
   const [isAddingTask, setIsAddingTask] = useState(false)
   const [updatingTaskId, setUpdatingTaskId] = useState<number | null>(null)
   const [deletingTaskId, setDeletingTaskId] = useState<number | null>(null)
+  const [editingTaskId, setEditingTaskId] = useState<number | null>(null)
+  const [editTaskTitle, setEditTaskTitle] = useState('')
+  const [editTaskDescription, setEditTaskDescription] = useState('')
+  const [editTaskDueDate, setEditTaskDueDate] = useState('')
+  const [isSavingTask, setIsSavingTask] = useState(false)
 
   const selectedProperty = properties.find((property) => property.id === selectedPropertyId)
 
@@ -191,6 +196,52 @@ function App() {
     }
   }
 
+  function startTaskEdit(task: MaintenanceTask) {
+    setTaskError(null)
+    setEditingTaskId(task.id)
+    setEditTaskTitle(task.title)
+    setEditTaskDescription(task.description)
+    setEditTaskDueDate(task.dueDate)
+  }
+
+  function cancelTaskEdit() {
+    setEditingTaskId(null)
+  }
+
+  async function handleTaskEditSubmit(
+    event: FormEvent<HTMLFormElement>,
+    task: MaintenanceTask,
+  ) {
+    event.preventDefault()
+    setTaskError(null)
+    setIsSavingTask(true)
+    try {
+      const response = await fetch(
+        `${apiBaseUrl}/properties/${task.propertyId}/maintenance-tasks/${task.id}`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: editTaskTitle,
+            description: editTaskDescription,
+            dueDate: editTaskDueDate,
+          }),
+        },
+      )
+      if (!response.ok) throw new Error(`Request failed: ${response.status}`)
+
+      const updatedTask: MaintenanceTask = await response.json()
+      setTasks((current) => current
+        .map((item) => item.id === updatedTask.id ? updatedTask : item)
+        .sort((a, b) => a.dueDate.localeCompare(b.dueDate)))
+      setEditingTaskId(null)
+    } catch (error) {
+      setTaskError(getErrorMessage(error))
+    } finally {
+      setIsSavingTask(false)
+    }
+  }
+
   return (
     <main className="app-shell">
       <header className="app-header">
@@ -253,14 +304,31 @@ function App() {
                 <article className="task-card" key={task.id}>
                   <div className={task.isCompleted ? 'status-dot complete' : 'status-dot'} aria-hidden="true" />
                   <div className="task-content">
-                    <div className="task-title-row">
-                      <h3>{task.title}</h3>
-                      <div className="task-actions">
-                        <button className={task.isCompleted ? 'status complete' : 'status'} disabled={updatingTaskId === task.id || deletingTaskId === task.id} onClick={() => void handleTaskStatusChange(task)} type="button">{updatingTaskId === task.id ? 'Saving…' : task.isCompleted ? 'Completed' : 'Mark complete'}</button>
-                        <button aria-label={`Delete ${task.title}`} className="delete-task-button" disabled={deletingTaskId === task.id || updatingTaskId === task.id} onClick={() => void handleTaskDelete(task)} type="button">{deletingTaskId === task.id ? 'Deleting…' : 'Delete'}</button>
-                      </div>
-                    </div>
-                    <p>{task.description}</p><time dateTime={task.dueDate}>Due {formatDueDate(task.dueDate)}</time>
+                    {editingTaskId === task.id ? (
+                      <form className="edit-task-form" onSubmit={(event) => void handleTaskEditSubmit(event, task)}>
+                        <div className="edit-task-grid">
+                          <div className="field"><label htmlFor={`edit-task-title-${task.id}`}>Task</label><input id={`edit-task-title-${task.id}`} maxLength={100} onChange={(event) => setEditTaskTitle(event.target.value)} required value={editTaskTitle} /></div>
+                          <div className="field"><label htmlFor={`edit-task-due-date-${task.id}`}>Due date</label><input id={`edit-task-due-date-${task.id}`} onChange={(event) => setEditTaskDueDate(event.target.value)} required type="date" value={editTaskDueDate} /></div>
+                          <div className="field description-field"><label htmlFor={`edit-task-description-${task.id}`}>Description</label><textarea id={`edit-task-description-${task.id}`} maxLength={500} onChange={(event) => setEditTaskDescription(event.target.value)} required rows={3} value={editTaskDescription} /></div>
+                        </div>
+                        <div className="edit-task-actions">
+                          <button className="cancel-button" disabled={isSavingTask} onClick={cancelTaskEdit} type="button">Cancel</button>
+                          <button className="primary-button" disabled={isSavingTask} type="submit">{isSavingTask ? 'Saving…' : 'Save changes'}</button>
+                        </div>
+                      </form>
+                    ) : (
+                      <>
+                        <div className="task-title-row">
+                          <h3>{task.title}</h3>
+                          <div className="task-actions">
+                            <button className={task.isCompleted ? 'status complete' : 'status'} disabled={updatingTaskId === task.id || deletingTaskId === task.id} onClick={() => void handleTaskStatusChange(task)} type="button">{updatingTaskId === task.id ? 'Saving…' : task.isCompleted ? 'Completed' : 'Mark complete'}</button>
+                            <button className="edit-task-button" disabled={deletingTaskId === task.id || updatingTaskId === task.id} onClick={() => startTaskEdit(task)} type="button">Edit</button>
+                            <button aria-label={`Delete ${task.title}`} className="delete-task-button" disabled={deletingTaskId === task.id || updatingTaskId === task.id} onClick={() => void handleTaskDelete(task)} type="button">{deletingTaskId === task.id ? 'Deleting…' : 'Delete'}</button>
+                          </div>
+                        </div>
+                        <p>{task.description}</p><time dateTime={task.dueDate}>Due {formatDueDate(task.dueDate)}</time>
+                      </>
+                    )}
                   </div>
                 </article>
               ))}

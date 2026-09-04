@@ -128,6 +128,30 @@ public class MaintenanceTasksController : ControllerBase
         return Ok(ToResponse(maintenanceTask));
     }
 
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult<MaintenanceTaskResponse>>
+        UpdateMaintenanceTask(
+            int propertyId,
+            int id,
+            UpdateMaintenanceTaskRequest request)
+    {
+        var maintenanceTask = await _dbContext.MaintenanceTasks
+            .FirstOrDefaultAsync(task =>
+                task.PropertyId == propertyId && task.Id == id);
+
+        if (maintenanceTask is null)
+        {
+            return NotFound();
+        }
+
+        maintenanceTask.Title = request.Title;
+        maintenanceTask.Description = request.Description;
+        maintenanceTask.DueDate = request.DueDate.GetValueOrDefault();
+        await _dbContext.SaveChangesAsync();
+
+        return Ok(ToResponse(maintenanceTask));
+    }
+
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteMaintenanceTask(
         int propertyId,
