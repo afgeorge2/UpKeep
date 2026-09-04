@@ -128,6 +128,26 @@ public class MaintenanceTasksController : ControllerBase
         return Ok(ToResponse(maintenanceTask));
     }
 
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteMaintenanceTask(
+        int propertyId,
+        int id)
+    {
+        var maintenanceTask = await _dbContext.MaintenanceTasks
+            .FirstOrDefaultAsync(task =>
+                task.PropertyId == propertyId && task.Id == id);
+
+        if (maintenanceTask is null)
+        {
+            return NotFound();
+        }
+
+        _dbContext.MaintenanceTasks.Remove(maintenanceTask);
+        await _dbContext.SaveChangesAsync();
+
+        return NoContent();
+    }
+
     private static MaintenanceTaskResponse ToResponse(MaintenanceTask task)
     {
         return new MaintenanceTaskResponse

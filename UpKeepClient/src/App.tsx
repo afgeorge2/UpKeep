@@ -31,6 +31,7 @@ function App() {
   const [isDeletingProperty, setIsDeletingProperty] = useState(false)
   const [isAddingTask, setIsAddingTask] = useState(false)
   const [updatingTaskId, setUpdatingTaskId] = useState<number | null>(null)
+  const [deletingTaskId, setDeletingTaskId] = useState<number | null>(null)
 
   const selectedProperty = properties.find((property) => property.id === selectedPropertyId)
 
@@ -166,6 +167,30 @@ function App() {
     }
   }
 
+  async function handleTaskDelete(task: MaintenanceTask) {
+    const shouldDelete = window.confirm(
+      `Delete "${task.title}"? This cannot be undone.`,
+    )
+
+    if (!shouldDelete) return
+
+    setTaskError(null)
+    setDeletingTaskId(task.id)
+    try {
+      const response = await fetch(
+        `${apiBaseUrl}/properties/${task.propertyId}/maintenance-tasks/${task.id}`,
+        { method: 'DELETE' },
+      )
+      if (!response.ok) throw new Error(`Request failed: ${response.status}`)
+
+      setTasks((current) => current.filter((item) => item.id !== task.id))
+    } catch (error) {
+      setTaskError(getErrorMessage(error))
+    } finally {
+      setDeletingTaskId(null)
+    }
+  }
+
   return (
     <main className="app-shell">
       <header className="app-header">
@@ -228,7 +253,13 @@ function App() {
                 <article className="task-card" key={task.id}>
                   <div className={task.isCompleted ? 'status-dot complete' : 'status-dot'} aria-hidden="true" />
                   <div className="task-content">
-                    <div className="task-title-row"><h3>{task.title}</h3><button className={task.isCompleted ? 'status complete' : 'status'} disabled={updatingTaskId === task.id} onClick={() => void handleTaskStatusChange(task)} type="button">{updatingTaskId === task.id ? 'Saving…' : task.isCompleted ? 'Completed' : 'Mark complete'}</button></div>
+                    <div className="task-title-row">
+                      <h3>{task.title}</h3>
+                      <div className="task-actions">
+                        <button className={task.isCompleted ? 'status complete' : 'status'} disabled={updatingTaskId === task.id || deletingTaskId === task.id} onClick={() => void handleTaskStatusChange(task)} type="button">{updatingTaskId === task.id ? 'Saving…' : task.isCompleted ? 'Completed' : 'Mark complete'}</button>
+                        <button aria-label={`Delete ${task.title}`} className="delete-task-button" disabled={deletingTaskId === task.id || updatingTaskId === task.id} onClick={() => void handleTaskDelete(task)} type="button">{deletingTaskId === task.id ? 'Deleting…' : 'Delete'}</button>
+                      </div>
+                    </div>
                     <p>{task.description}</p><time dateTime={task.dueDate}>Due {formatDueDate(task.dueDate)}</time>
                   </div>
                 </article>
