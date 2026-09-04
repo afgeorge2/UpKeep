@@ -5,6 +5,8 @@ VisualStudioVersion = 17.14.37614.0 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpKeep", "UpKeep\UpKeep.csproj", "{5F61957F-9C41-4303-BBCE-5C32AB2FB930}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpKeep.Tests", "UpKeep.Tests\UpKeep.Tests.csproj", "{A4B8B9D4-50AF-4F20-A48D-603F233DB5A7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{5F61957F-9C41-4303-BBCE-5C32AB2FB930}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F61957F-9C41-4303-BBCE-5C32AB2FB930}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F61957F-9C41-4303-BBCE-5C32AB2FB930}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4B8B9D4-50AF-4F20-A48D-603F233DB5A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4B8B9D4-50AF-4F20-A48D-603F233DB5A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4B8B9D4-50AF-4F20-A48D-603F233DB5A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4B8B9D4-50AF-4F20-A48D-603F233DB5A7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
