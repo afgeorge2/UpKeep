@@ -30,6 +30,12 @@ namespace UpKeep.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTimeOffset?>("CompletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CompletionNotes")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -37,11 +43,50 @@ namespace UpKeep.Data.Migrations
                     b.Property<DateOnly>("DueDate")
                         .HasColumnType("date");
 
-                    b.Property<bool>("IsCompleted")
+                    b.Property<int>("EstimatedMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("GeneratedFromTaskId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("HasBeenEdited")
+                        .IsConcurrencyToken()
                         .HasColumnType("bit");
+
+                    b.Property<bool>("HasCreatedNextOccurrence")
+                        .IsConcurrencyToken()
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Instructions")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsCompleted")
+                        .IsConcurrencyToken()
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSkipped")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastPurchase")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PropertyId")
                         .HasColumnType("int");
+
+                    b.Property<int>("RepeatEveryMonths")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("RepeatFromCompletion")
+                        .HasColumnType("bit");
+
+                    b.Property<DateOnly?>("ScheduleAnchor")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Supplies")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .IsRequired()

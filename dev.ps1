@@ -33,7 +33,25 @@ function Stop-ProcessTree {
 }
 
 if (Test-LocalPort -Port 5085) {
-    throw 'Port 5085 is already in use. Stop the running UpKeep API and try again.'
+    $upkeepReady = $false
+    try {
+        $apiDescription = Invoke-RestMethod 'http://localhost:5085/swagger/v1/swagger.json' -TimeoutSec 5
+        $clientPage = Invoke-WebRequest 'http://localhost:5173' -UseBasicParsing -TimeoutSec 5
+        $proxyResponse = Invoke-WebRequest 'http://localhost:5173/api/properties' -UseBasicParsing -TimeoutSec 5
+        $upkeepReady = $apiDescription.info.title -eq 'UpKeep' -and
+            $clientPage.Content -match '<title>upkeepclient</title>' -and
+            $proxyResponse.StatusCode -eq 200 -and
+            $proxyResponse.Headers['Content-Type'] -match 'application/json'
+    }
+    catch {
+        # An occupied port alone does not mean the app is ready.
+    }
+    if ($upkeepReady) {
+        Write-Host 'UpKeep is already running: http://localhost:5173'
+        Write-Host 'Refresh the page to use it. The existing servers remain running.'
+        return
+    }
+    throw 'Port 5085 is occupied, but the complete UpKeep app is not responding. Stop the existing API in its original terminal, then run .\dev.ps1 again.'
 }
 
 if (-not (Test-Path -LiteralPath $viteCli)) {
@@ -42,6 +60,12 @@ if (-not (Test-Path -LiteralPath $viteCli)) {
 
 Write-Host 'Starting UpKeep API and React client...'
 Write-Host 'Press Ctrl+C to stop both.'
+
+# This launcher starts Vite directly, so npm predev does not run automatically.
+& node (Join-Path $clientDirectory 'scripts\prepare-ocr.mjs')
+if ($LASTEXITCODE -ne 0) {
+    throw 'Could not prepare the equipment-label reader. Run npm install in UpKeepClient and try again.'
+}
 
 try {
     $apiProcess = Start-Process `

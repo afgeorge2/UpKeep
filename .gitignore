@@ -12,6 +12,8 @@
 
 # React / Node
 node_modules/
+.npm-cache/
+UpKeepClient/public/ocr/
 dist/
 .env
 .env.local
