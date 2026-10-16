@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using UpKeep.Contracts.Properties;
 using UpKeep.Data;
 using UpKeep.Models;
+using UpKeep.Security;
 
 namespace UpKeep.Controllers;
 
@@ -11,10 +12,14 @@ namespace UpKeep.Controllers;
 public class PropertiesController : ControllerBase
 {
     private readonly UpKeepDbContext _dbContext;
+    private readonly WorkspaceAccess _workspaceAccess;
 
-    public PropertiesController(UpKeepDbContext dbContext)
+    public PropertiesController(
+        UpKeepDbContext dbContext,
+        WorkspaceAccess workspaceAccess)
     {
         _dbContext = dbContext;
+        _workspaceAccess = workspaceAccess;
     }
 
     [HttpGet]
@@ -49,7 +54,8 @@ public class PropertiesController : ControllerBase
         var property = new Property
         {
             Name = request.Name,
-            Address = request.Address
+            Address = request.Address,
+            WorkspaceId = await _workspaceAccess.GetPersonalWorkspaceId()
         };
 
         _dbContext.Properties.Add(property);

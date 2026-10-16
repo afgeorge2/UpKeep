@@ -74,6 +74,12 @@ button:disabled { cursor: wait; opacity: .58; }
 .no-selection h2 { margin: 5px 0 8px; }
 .error { margin: 7px 0 0; color: var(--danger); font-size: .78rem; }
 .panel-error { padding: 14px; border-radius: 9px; background: var(--danger-soft); }
+.signin-panel { max-width: 540px; margin: 12vh auto; padding: 36px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); box-shadow: var(--shadow); line-height: 1.6; }
+.signin-panel h1 { margin-bottom: 18px; }
+.signin-link { display: inline-flex; align-items: center; text-decoration: none; }
+.account-bar { display: flex; justify-content: flex-end; align-items: center; flex-wrap: wrap; gap: 12px; width: min(1180px, calc(100% - 40px)); margin: 0 auto -44px; padding-top: 18px; color: var(--text-muted); font-size: .85rem; }
+.account-button { min-height: 36px; padding: 6px 12px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); color: var(--text); font-weight: 750; cursor: pointer; }
+.account-button:hover { border-color: var(--accent); }
 @media (max-width: 800px) {
   .app-shell { width: min(100% - 24px, 600px); padding: 30px 0; }
   .app-header { align-items: flex-end; }

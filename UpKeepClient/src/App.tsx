@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import './App.css'
+import { apiFetch } from './api'
 
 const apiBaseUrl = '/api'
 
@@ -69,7 +70,7 @@ function App() {
   useEffect(() => {
     async function loadProperties() {
       try {
-        const response = await fetch(`${apiBaseUrl}/properties`)
+        const response = await apiFetch(`${apiBaseUrl}/properties`)
         if (!response.ok) throw new Error(`Request failed: ${response.status}`)
         const data: Property[] = await response.json()
         setProperties(data)
@@ -92,7 +93,7 @@ function App() {
       setIsLoadingTasks(true)
       setTaskError(null)
       try {
-        const response = await fetch(`${apiBaseUrl}/properties/${selectedPropertyId}/maintenance-tasks`, { signal: controller.signal })
+        const response = await apiFetch(`${apiBaseUrl}/properties/${selectedPropertyId}/maintenance-tasks`, { signal: controller.signal })
         if (!response.ok) throw new Error(`Request failed: ${response.status}`)
         setTasks(await response.json() as MaintenanceTask[])
       } catch (error) {
@@ -110,7 +111,7 @@ function App() {
     setPropertyError(null)
     setIsAddingProperty(true)
     try {
-      const response = await fetch(`${apiBaseUrl}/properties`, {
+      const response = await apiFetch(`${apiBaseUrl}/properties`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: propertyName, address: propertyAddress }),
       })
@@ -133,7 +134,7 @@ function App() {
     setTaskError(null)
     setIsAddingTask(true)
     try {
-      const response = await fetch(`${apiBaseUrl}/properties/${selectedPropertyId}/maintenance-tasks`, {
+      const response = await apiFetch(`${apiBaseUrl}/properties/${selectedPropertyId}/maintenance-tasks`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: taskTitle, description: taskDescription, dueDate: taskDueDate }),
       })
@@ -154,7 +155,7 @@ function App() {
     setTaskError(null)
     setUpdatingTaskId(task.id)
     try {
-      const response = await fetch(`${apiBaseUrl}/properties/${task.propertyId}/maintenance-tasks/${task.id}/status`, {
+      const response = await apiFetch(`${apiBaseUrl}/properties/${task.propertyId}/maintenance-tasks/${task.id}/status`, {
         method: 'PATCH', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isCompleted: !task.isCompleted }),
       })
@@ -180,7 +181,7 @@ function App() {
     setPropertyDeleteError(null)
     setIsDeletingProperty(true)
     try {
-      const response = await fetch(`${apiBaseUrl}/properties/${selectedProperty.id}`, {
+      const response = await apiFetch(`${apiBaseUrl}/properties/${selectedProperty.id}`, {
         method: 'DELETE',
       })
       if (!response.ok) throw new Error(`Request failed: ${response.status}`)
@@ -208,7 +209,7 @@ function App() {
     setTaskError(null)
     setDeletingTaskId(task.id)
     try {
-      const response = await fetch(
+      const response = await apiFetch(
         `${apiBaseUrl}/properties/${task.propertyId}/maintenance-tasks/${task.id}`,
         { method: 'DELETE' },
       )
@@ -242,7 +243,7 @@ function App() {
     setTaskError(null)
     setIsSavingTask(true)
     try {
-      const response = await fetch(
+      const response = await apiFetch(
         `${apiBaseUrl}/properties/${task.propertyId}/maintenance-tasks/${task.id}`,
         {
           method: 'PUT',

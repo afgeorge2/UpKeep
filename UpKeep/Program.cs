@@ -1,7 +1,13 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UpKeep.Data;
+using UpKeep.Security;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddUpKeepAuthentication(
+    builder.Configuration,
+    builder.Environment);
 
 builder.Services.AddDbContext<UpKeepDbContext>(options =>
 {
@@ -13,7 +19,8 @@ builder.Services.AddDbContext<UpKeepDbContext>(options =>
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllersWithViews(options =>
+    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
 
 builder.Services.AddCors(options =>
 {
@@ -43,7 +50,25 @@ app.UseHttpsRedirection();
 
 app.UseCors("Frontend");
 
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.Use(async (context, next) =>
+{
+    var isProtectedApi =
+        context.Request.Path.StartsWithSegments("/api") &&
+        !context.Request.Path.StartsWithSegments("/api/auth");
+
+    if (isProtectedApi &&
+        context.User.Identity?.IsAuthenticated == true)
+    {
+        var workspaceAccess = context.RequestServices
+            .GetRequiredService<WorkspaceAccess>();
+        await workspaceAccess.GetPersonalWorkspaceId();
+    }
+
+    await next(context);
+});
 
 app.MapControllers();
 

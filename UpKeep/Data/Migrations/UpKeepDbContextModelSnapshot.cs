@@ -70,9 +70,40 @@ namespace UpKeep.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("WorkspaceId")
+                        .HasColumnType("nvarchar(64)");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("WorkspaceId");
+
                     b.ToTable("Properties");
+                });
+
+            modelBuilder.Entity("UpKeep.Models.Workspace", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Workspaces");
+                });
+
+            modelBuilder.Entity("UpKeep.Models.WorkspaceMember", b =>
+                {
+                    b.Property<string>("WorkspaceId")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("UserKey")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.HasKey("WorkspaceId", "UserKey");
+
+                    b.ToTable("WorkspaceMembers");
                 });
 
             modelBuilder.Entity("UpKeep.Models.MaintenanceTask", b =>
@@ -88,7 +119,33 @@ namespace UpKeep.Data.Migrations
 
             modelBuilder.Entity("UpKeep.Models.Property", b =>
                 {
+                    b.HasOne("UpKeep.Models.Workspace", "Workspace")
+                        .WithMany()
+                        .HasForeignKey("WorkspaceId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Workspace");
+                });
+
+            modelBuilder.Entity("UpKeep.Models.WorkspaceMember", b =>
+                {
+                    b.HasOne("UpKeep.Models.Workspace", "Workspace")
+                        .WithMany("Members")
+                        .HasForeignKey("WorkspaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Workspace");
+                });
+
+            modelBuilder.Entity("UpKeep.Models.Property", b =>
+                {
                     b.Navigation("MaintenanceTasks");
+                });
+
+            modelBuilder.Entity("UpKeep.Models.Workspace", b =>
+                {
+                    b.Navigation("Members");
                 });
 #pragma warning restore 612, 618
         }

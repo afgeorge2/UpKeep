@@ -12,7 +12,7 @@ public sealed class MaintenanceTasksApiTests :
 
     public MaintenanceTasksApiTests(UpKeepApiFactory factory)
     {
-        _client = factory.CreateClient();
+        _client = factory.CreateCsrfClient();
     }
 
     [Fact]
